@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 etl.py
 
@@ -26,12 +25,12 @@ import json
 import re
 from datetime import datetime
 
-# CONFIG
+
 OMDB_URL = "https://www.omdbapi.com/"
 CACHE_FILE = "omdb_cache.json"
-SLEEP_BETWEEN_CALLS = 0.2  # adjust if you hit rate limits
+SLEEP_BETWEEN_CALLS = 0.2 
 
-# Utilities
+
 def load_cache(path):
     if os.path.exists(path):
         try:
@@ -67,9 +66,9 @@ def query_omdb(title, imdb_id, year, api_key, cache):
             if data.get("Response") == "True":
                 return data
     except Exception as e:
-        print(f"⚠️  OMDb fetch failed for '{title}': {e}")
+        print(f"  OMDb fetch failed for '{title}': {e}")
 
-    # ---- Mock offline fallback data ----
+   
     fake_directors = ["Steven Spielberg", "Christopher Nolan", "Ridley Scott", "James Cameron", "Martin Scorsese"]
     fake_box_office = [random.randint(50, 500) * 1_000_000 for _ in range(5)]
     fake_plot = [
@@ -89,7 +88,7 @@ def query_omdb(title, imdb_id, year, api_key, cache):
     }
 
 def extract_year_from_title(title):
-    # MovieLens titles often append year in parentheses, e.g. "Toy Story (1995)"
+  
     m = re.search(r'\((\d{4})\)\s*$', title)
     if m:
         try:
@@ -99,10 +98,10 @@ def extract_year_from_title(title):
     return None
 
 def clean_title(title):
-    # remove year parentheses if present
+
     return re.sub(r'\s*\(\d{4}\)\s*$', '', title).strip()
 
-# DB helpers
+
 def run_sql_script(conn, sql_path):
     with open(sql_path, "r", encoding="utf-8") as f:
         script = f.read()
@@ -110,11 +109,10 @@ def run_sql_script(conn, sql_path):
     conn.commit()
 
 def upsert_movie(conn, movie_obj):
-    # movie_obj keys: movieId, imdb_id, title, year, runtime, plot, box_office, omdb_imdb_rating
-    # Use imdb_id unique preferred. If imdb_id missing, fallback on movieId + title uniqueness.
+   
     cur = conn.cursor()
     if movie_obj.get("imdb_id"):
-        # Try to insert or update by imdb_id
+       
         cur.execute("""
             SELECT id FROM movies WHERE imdb_id = ?
         """, (movie_obj["imdb_id"],))
@@ -139,7 +137,7 @@ def upsert_movie(conn, movie_obj):
             conn.commit()
             return cur.lastrowid
     else:
-        # fallback uniqueness on movieId + title
+       
         cur.execute("SELECT id FROM movies WHERE movieId=? AND title=?", (movie_obj.get("movieId"), movie_obj.get("title")))
         row = cur.fetchone()
         if row:
@@ -192,14 +190,14 @@ def ensure_movie_director(conn, movie_id, director_id):
     conn.commit()
 
 def load_ratings(conn, ratings_df):
-    # idempotent: we will insert only ratings that don't already exist (simple approach: deduplicate by userId+movieId+rating+timestamp)
+   
     cur = conn.cursor()
     for idx, row in ratings_df.iterrows():
         userId = int(row['userId'])
         movieId = int(row['movieId'])
         rating = float(row['rating'])
         ts = int(row['timestamp']) if 'timestamp' in row and not pd.isna(row['timestamp']) else None
-        # Check if exists
+        
         cur.execute("""
             SELECT id FROM ratings WHERE userId=? AND movieId=? AND rating=? AND (timestamp IS ? OR timestamp=?)
         """, (userId, movieId, rating, None if ts is None else ts, ts))
@@ -222,34 +220,34 @@ def main(args):
         return
 
     cache = load_cache(CACHE_FILE)
-    # Read CSVs
+   
     movies_df = pd.read_csv(args.movies)
     ratings_df = pd.read_csv(args.ratings)
 
-    # Basic cleaning: ensure expected columns
+   
     if 'movieId' not in movies_df.columns or 'title' not in movies_df.columns:
         raise ValueError("movies.csv must contain 'movieId' and 'title' columns")
     if 'userId' not in ratings_df.columns or 'movieId' not in ratings_df.columns or 'rating' not in ratings_df.columns:
         raise ValueError("ratings.csv must contain 'userId', 'movieId', 'rating' columns")
 
-    # Connect DB
+
     conn = sqlite3.connect(args.db)
     conn.execute("PRAGMA foreign_keys = ON;")
-    # Initialize schema if not present
+   
     run_sql_script(conn, args.schema)
 
-    # For each movie, enrich via OMDb
+  
     for idx, row in movies_df.iterrows():
         movieId = int(row['movieId'])
         raw_title = row['title']
         year_in_title = extract_year_from_title(raw_title)
         title_clean = clean_title(raw_title)
-        # Attempt OMDb by title+year, fallback to title only
+       
         omdb_response = query_omdb(title=title_clean, imdb_id=None, year=year_in_title, api_key=api_key, cache=cache)
         if omdb_response.get("Response") == "False":
-            # second attempt: try title only without year
+        
             omdb_response = query_omdb(title=title_clean, imdb_id=None, year=None, api_key=api_key, cache=cache)
-        # prepare movie object
+
         movie_obj = {
             "movieId": movieId,
             "imdb_id": omdb_response.get("imdbID") if omdb_response.get("Response") == "True" else None,
@@ -261,7 +259,7 @@ def main(args):
             "omdb_imdb_rating": None
         }
         if omdb_response.get("Response") == "True":
-            # parse runtime e.g. "142 min"
+           
             run_text = omdb_response.get("Runtime")
             if run_text and run_text.lower() != "n/a":
                 m = re.match(r'(\d+)', run_text)
@@ -275,33 +273,33 @@ def main(args):
             except:
                 movie_obj["omdb_imdb_rating"] = None
 
-        # upsert into movies table
+       
         movie_row_id = upsert_movie(conn, movie_obj)
 
-        # genres from movies.csv if available (pipe separated)
+       
         if 'genres' in row and pd.notna(row['genres']):
             raw_genres = row['genres']
-            # MovieLens uses '|' separated; also handle '(no genres listed)'
+            
             if raw_genres.strip().lower() != "(no genres listed)":
                 genre_list = [g.strip() for g in str(raw_genres).split("|") if g.strip() and g.strip().lower() != "(no genres listed)"]
                 for g in genre_list:
                     gid = get_or_create_genre(conn, g)
                     ensure_movie_genre(conn, movie_row_id, gid)
 
-        # directors from OMDb (string like "Frank Darabont")
+       
         if omdb_response.get("Response") == "True":
             directors_raw = omdb_response.get("Director")
             if directors_raw and directors_raw != "N/A":
-                # multiple directors separated by comma
+               
                 directors = [d.strip() for d in directors_raw.split(",") if d.strip()]
                 for d in directors:
                     did = get_or_create_director(conn, d)
                     ensure_movie_director(conn, movie_row_id, did)
 
-    # Save cache
+    
     save_cache(CACHE_FILE, cache)
 
-    # Load ratings (idempotent)
+    
     load_ratings(conn, ratings_df)
 
     conn.close()
