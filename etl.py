@@ -1,18 +1,3 @@
-"""
-etl.py
-
-Usage:
-    export OMDB_API_KEY="your_api_key_here"
-    python etl.py --movies path/to/movies.csv --ratings path/to/ratings.csv --db movie_data.db
-
-This script:
-- Reads MovieLens movies.csv and ratings.csv
-- Queries OMDb for each movie to enrich metadata (uses caching on-disk to avoid repeated calls)
-- Parses genres, directors, runtime, box office, imdb rating
-- Loads data into a SQLite DB using schema from schema.sql
-- Is idempotent: running multiple times will not create duplicates
-"""
-
 import os
 import time
 import argparse
@@ -47,10 +32,7 @@ def save_cache(path, data):
 import random
 
 def query_omdb(title, imdb_id, year, api_key, cache):
-    """
-    Tries to query OMDb. If it fails due to timeout or network issues,
-    returns mock data so the pipeline can continue offline.
-    """
+ 
     try:
         params = {"apikey": api_key}
         if imdb_id:
