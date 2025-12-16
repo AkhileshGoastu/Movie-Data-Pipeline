@@ -1,0 +1,21 @@
+movie_id,title,genre,director,plot,box_office,year
+1,Toy Story (1995),Adventure|Animation,John Lasseter,Toys come to life when humans aren't around,$373000000,1995
+2,Jumanji (1995),Adventure|Fantasy,Joe Johnston,A magical board game unleashes chaos,$262000000,1995
+3,KGF Chapter 1 (2018),Action|Drama,Prashanth Neel,Story of Rocky in the gold mines,$250000000,2018
+4,Lucia (2013),Drama|Mystery,Pawan Kumar,A man blurs dreams and reality,$1200000,2013
+5,3 Idiots (2009),Comedy|Drama,Rajkumar Hirani,College life and friendship,$460000000,2009
+6,Avengers: Endgame (2019),Action|Adventure,Anthony Russo,Heroes unite to save universe,$2797800564,2019
+7,Raajakumara (2017),Action|Drama,Puneeth Rajkumar,Family and revenge story,$22000000,2017
+8,Baahubali: The Beginning (2015),Action|Drama|Fantasy,S.S. Rajamouli,Epic kingdom battle,$650000000,2015
+9,The Dark Knight (2008),Action|Crime|Drama,Christopher Nolan,Batman faces the Joker chaos,$1004558444,2008
+10,Inception (2010),Action|Sci-Fi|Thriller,Christopher Nolan,A thief steals secrets through dreams,$829895144,2010
+11,Interstellar (2014),Adventure|Drama|Sci-Fi,Christopher Nolan,A team travels through a wormhole to save humanity,$677471339,2014
+12,Parasite (2019),Comedy|Drama|Thriller,Bong Joon Ho,A poor family schemes to infiltrate a wealthy household,$258794094,2019
+13,Spider-Man: No Way Home (2021),Action|Adventure|Sci-Fi,Jon Watts,Peter Parker faces multiverse threats,$1900000000,2021
+14,Dangal (2016),Biography|Drama|Sport,Nitesh Tiwari,A father trains his daughters to become wrestling champions,$300000000,2016
+15,The Shawshank Redemption (1994),Drama|Crime,Frank Darabont,Two imprisoned men bond over years,$28341469,1994
+16,Forrest Gump (1994),Drama|Romance,Robert Zemeckis,The life story of a simple man witnessing historical events,$678226465,1994
+17,Gladiator (2000),Action|Adventure|Drama,Ridley Scott,A betrayed Roman general seeks revenge,$457640427,2000
+18,The Lion King (1994),Animation|Adventure|Drama,Roger Allers,A young lion prince flees and later reclaims his kingdom,$968483777,1994
+19,Avengers: Infinity War (2018),Action|Adventure|Sci-Fi,Anthony Russo,Heroes unite to stop Thanos,$2048359754,2018
+20,Black Panther (2018),Action|Adventure|Sci-Fi,Ryan Coogler,The king of Wakanda fights for his throne,$1346913161,2018
