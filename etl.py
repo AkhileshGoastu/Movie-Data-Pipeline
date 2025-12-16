@@ -6,7 +6,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from urllib.parse import quote_plus
 
-password = quote_plus("Akhilesh@007")  # encode special chars
+password = quote_plus("Akhilesh@007") 
 DB_URI = f"mysql+mysqlconnector://root:{password}@localhost:3306/movie_db"
 OMDB_API_KEY = os.getenv("OMDB_API_KEY", "85e3c510")  # fallback API key
 MOVIE_LIMIT = 500
@@ -60,7 +60,7 @@ def run_etl(movies_csv="movies.csv", ratings_csv="ratings.csv"):
             "plot": data.get("Plot") if data and data.get("Plot") else None,
             "box_office": data.get("BoxOffice") if data and data.get("BoxOffice") else None
         })
-        time.sleep(0.1)  # avoid hitting OMDb rate limits
+        time.sleep(0.1) 
 
     enriched_df = pd.DataFrame(enriched)
 
