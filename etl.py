@@ -8,7 +8,7 @@ from urllib.parse import quote_plus
 
 password = quote_plus("Akhilesh@007") 
 DB_URI = f"mysql+mysqlconnector://root:{password}@localhost:3306/movie_db"
-OMDB_API_KEY = os.getenv("OMDB_API_KEY", "85e3c510")  # fallback API key
+OMDB_API_KEY = os.getenv("OMDB_API_KEY", "85e3c510") 
 MOVIE_LIMIT = 500
 
 def fetch_omdb(title, year=None):
